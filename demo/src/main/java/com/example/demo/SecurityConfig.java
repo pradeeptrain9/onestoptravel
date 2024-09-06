@@ -12,9 +12,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests(authorizeRequests ->
+        http
+                .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/", "/login").permitAll() // Allow access to home and login pages
+                                .requestMatchers( "/login").permitAll() // Allow access to home and login pages
                                 .anyRequest().authenticated() // All other requests require authentication
                 )
                 .oauth2Login(oauth2Login ->
@@ -22,6 +23,13 @@ public class SecurityConfig {
                                 .loginPage("/login") // Custom login page
                                 .defaultSuccessUrl("/home", true) // Redirect to home on successful login
                                 .failureUrl("/login?error=true")
+                )
+                .formLogin(formLogin ->
+                        formLogin
+                                .loginPage("/login") // Custom login page
+                                .defaultSuccessUrl("/home", true) // Redirect to home on successful login
+                                .failureUrl("/login?error=true") // Redirect to login page if login fails
+                                .permitAll()
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement

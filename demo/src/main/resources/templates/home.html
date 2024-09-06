@@ -1,17 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/home.css}" />
+
 </head>
 <body>
+
+<!-- Header with Logout button at the top-right corner -->
+<div class="header">
+    <h2>OneStopTravel</h2>
+    <form method="post" action="/logout">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+</div>
+
+<!-- Main content of the page -->
 <div class="container">
     <h2>Welcome to the Home Page</h2>
     <p>You are successfully logged in!</p>
-    <a href="/login">
-        <button type="button">Logout</button>
-    </a>
 </div>
+
 </body>
 </html>
