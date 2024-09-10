@@ -15,7 +15,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers( "/css/styles.css","/login").permitAll() // Allow access to home and login pages
+                                .requestMatchers( "/css/styles.css","/login").permitAll()// Allow access to home and login pages
+                                .requestMatchers("/home").authenticated()// Protected route for authenticated users
                                 .anyRequest().authenticated() // All other requests require authentication
                 )
                 .oauth2Login(oauth2Login ->

@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,8 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class HomeController {
 
     @GetMapping("/login")
-    public String login() {
-        return "login"; // Serve the login.html template
+    public String login(Authentication authentication) {
+        // Check if the user is already authenticated
+        if (authentication != null && authentication.isAuthenticated()) {
+            // Redirect to homepage or dashboard if already logged in
+            return "redirect:/home";
+        }
+        // Render the login page if the user is not authenticated
+        return "login";
     }
 
     @GetMapping("/home")
