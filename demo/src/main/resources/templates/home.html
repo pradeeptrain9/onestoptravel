@@ -12,7 +12,7 @@
 <!-- Header with Logout button at the top-right corner -->
 <div class="header">
     <h2>OneStopTravel</h2>
-    <form method="post" action="/logout">
+    <form th:action="@{/logout}" method="post">
         <button type="submit" class="logout-btn">Logout</button>
     </form>
 </div>

@@ -37,6 +37,14 @@ public class SecurityConfig {
                                 .failureUrl("/login?error=true") // Redirect to login page if login fails
                                 .permitAll()
                 )
+                .logout(logout ->
+                        logout
+                                .logoutUrl("/logout") // Custom logout URL
+                                .logoutSuccessUrl("/login?logout=true") // Redirect to login page on successful logout
+                                .invalidateHttpSession(true) // Invalidate session
+                                .deleteCookies("JSESSIONID") // Delete session cookies
+                                .permitAll()
+                )
                 .sessionManagement(sessionManagement ->
                         sessionManagement
                                 .maximumSessions(1) // Allow only one session per user
