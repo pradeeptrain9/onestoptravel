@@ -1,26 +1,32 @@
 package com.example.demo;
 
+import com.example.demo.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final UserService userService;
+
+    public SecurityConfig(UserService userService) {
+        this.userService = userService;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers( "/css/**","/home").permitAll()// Allow access to home and login pages
+                                .requestMatchers( "/css/**","/login","/register","/h2-console/**").permitAll()// Allow access to home and login pages
                                 .requestMatchers("/home").authenticated()// Protected route for authenticated users
                                 .anyRequest().authenticated() // All other requests require authentication
                 )
@@ -55,25 +61,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(
-                User.withUsername("user")
-                        .password(passwordEncoder().encode("password"))
-                        .roles("USER")
-                        .build()
-        );
-        manager.createUser(
-                User.withUsername("admin")
-                        .password(passwordEncoder().encode("admin"))
-                        .roles("ADMIN")
-                        .build()
-        );
-        return manager;
-    }
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
+        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return userRequest -> {
+            OAuth2User oAuth2User = delegate.loadUser(userRequest);
+
+            // Extract user information and store in the database
+            String email = oAuth2User.getAttribute("email");
+            String name = oAuth2User.getAttribute("name");
+
+            userService.processOAuthPostLogin(email, name);
+
+            return oAuth2User;
+        };
     }
 }
