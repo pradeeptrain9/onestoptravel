@@ -1,50 +1,127 @@
+/* General styles for the page */
 body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
 
-        .header {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* Header */
+.header {
+    background-color: #004080;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .header h2 {
-            margin: 0;
-        }
+.header h2 {
+    margin: 0;
+    font-size: 2rem;
+}
 
-        .header .logout-btn {
-            background-color: #ff4d4d;
-            border: none;
-            padding: 10px 20px;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+.logout-btn {
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
-        .header .logout-btn:hover {
-            background-color: #d63333;
-        }
+.logout-btn:hover {
+    background-color: #e65c00;
+}
 
-        .container {
-            text-align: center;
-            padding: 40px;
-            margin-top: 20px;
-        }
+/* Main content container */
+.container {
+    width: 80%;
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
 
-        .container h2 {
-            font-size: 28px;
-            color: #333;
-        }
+/* Form styling */
+form {
+    display: flex;
+    flex-direction: column;
+}
 
-        .container p {
-            font-size: 18px;
-            color: #666;
-        }
+/* Input group */
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.input-group label {
+    flex-basis: 100%;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.input-group input[type="date"],
+.input-group select {
+    flex-basis: 48%;
+    padding: 10px;
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+    background-color: #004080; /* Dark blue background for inputs */
+    color: #fff; /* White text for contrast */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="date"]:focus,
+select:focus {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(255, 215, 0, 0.7); /* Gold shadow on focus */
+}
+
+/* Custom dropdown styling */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"%3E%3Cpath fill="%23FFFFFF" d="M2 0L0 2h4z"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 8px 10px;
+}
+
+select::-ms-expand {
+    display: none; /* Hide default arrow in IE */
+}
+
+.book-btn {
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.book-btn:hover {
+    background-color: #e65c00;
+}
+
+/* Add media queries for responsiveness */
+@media (max-width: 600px) {
+    .input-group select,
+    .input-group input[type="date"] {
+        flex-basis: 100%; /* Make inputs full width on smaller screens */
+    }
+}

@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers( "/css/**","/login","/register","/h2-console/**").permitAll()// Allow access to home and login pages
+                                .requestMatchers( "/css/**","/login","/getLocations").permitAll()// Allow access to home and login pages
                                 .requestMatchers("/home").authenticated()// Protected route for authenticated users
                                 .anyRequest().authenticated() // All other requests require authentication
                 )

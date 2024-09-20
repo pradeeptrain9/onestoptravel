@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Book Your Journey</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" th:href="@{/css/home.css}" />
-
 </head>
 <body>
 
-<!-- Header with Logout button at the top-right corner -->
+<!-- Header with Logout button in the top-right corner -->
 <div class="header">
     <h2>OneStopTravel</h2>
     <form th:action="@{/logout}" method="post">
@@ -19,9 +19,64 @@
 
 <!-- Main content of the page -->
 <div class="container">
-    <h2>Welcome to the Home Page</h2>
-    <p>You are successfully logged in!</p>
+    <h2>Book Your Journey</h2>
+
+    <!-- Booking Form -->
+    <form th:action="@{/bookJourney}" method="post">
+        <!-- Select From and To in the same row -->
+        <div class="input-group">
+            <label for="from">From</label>
+            <select id="from" name="from" required>
+                <!-- Options will be dynamically populated -->
+            </select>
+
+            <label for="to">To</label>
+            <select id="to" name="to" required>
+                <!-- Options will be dynamically populated -->
+            </select>
+        </div>
+
+        <!-- Date selection -->
+        <div class="input-group">
+            <label for="date">Journey Date</label>
+            <input type="date" id="date" name="date" required />
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="book-btn">Book Journey</button>
+    </form>
 </div>
+
+<!-- AJAX to dynamically populate 'From' and 'To' fields -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Initialize select2 on the From and To selects for better user experience
+        $('#from, #to').select2({
+            placeholder: 'Select a city',
+            width: '100%',
+        });
+
+        // Populate the select dropdowns with locations
+        $.ajax({
+            url: "/getLocations", // Make sure this matches the endpoint in your controller
+            method: "GET",
+            success: function (locations) {
+                const fromSelect = $("#from");
+                const toSelect = $("#to");
+
+                locations.forEach(function (location) {
+                    fromSelect.append(new Option(location, location));
+                    toSelect.append(new Option(location, location));
+                });
+            },
+            error: function () {
+                alert("Error fetching locations. Please try again.");
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
