@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Your Journey</title>
+    <title>Book Your Journey - OneStopTravel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" th:href="@{/css/home.css}" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxOmAzwV1e3o5EqlM7LyA7MKGvYD-TUf0&libraries=places"></script>
 </head>
 <body>
 
@@ -22,7 +24,7 @@
     <h2>Book Your Journey</h2>
 
     <!-- Booking Form -->
-    <form th:action="@{/bookJourney}" method="post">
+    <form id="journeyForm" th:action="@{/bookJourney}" method="post">
         <!-- Select From and To in the same row -->
         <div class="input-group">
             <label for="from">From</label>
@@ -47,20 +49,37 @@
     </form>
 </div>
 
-<!-- AJAX to dynamically populate 'From' and 'To' fields -->
+<!-- Transport Options Modal -->
+<div id="transportModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Select Your Mode of Transport:</h3>
+        <button id="busOption" class="transport-btn">
+            <i class="fas fa-bus"></i> Bus
+        </button>
+
+        <!-- Train Option with Icon -->
+        <button id="trainOption" class="transport-btn">
+            <i class="fas fa-train"></i> Train
+        </button>
+
+        <!-- Flight Option with Icon -->
+        <button id="flightOption" class="transport-btn">
+            <i class="fas fa-plane"></i> Flight
+        </button>
+    </div>
+</div>
+
+<!-- Google Map -->
+<div id="map" style="height: 500px; width: 100%; margin-top: 30px; display: none;"></div>
+
+<!-- Load jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
     $(document).ready(function () {
-        // Initialize select2 on the From and To selects for better user experience
-        $('#from, #to').select2({
-            placeholder: 'Select a city',
-            width: '100%',
-        });
-
-        // Populate the select dropdowns with locations
+        // Populate 'From' and 'To' dropdowns with available locations
         $.ajax({
-            url: "/getLocations", // Make sure this matches the endpoint in your controller
+            url: "/getLocations",
             method: "GET",
             success: function (locations) {
                 const fromSelect = $("#from");
@@ -75,6 +94,66 @@
                 alert("Error fetching locations. Please try again.");
             }
         });
+
+        // Handle form submission and show transport options modal
+        $('#journeyForm').on('submit', function (e) {
+            e.preventDefault(); // Prevent form submission
+
+            // Show transport options modal
+            $('#transportModal').fadeIn();
+
+            const from = $('#from').val();
+            const to = $('#to').val();
+            const date = $('#date').val();
+
+            // Click event for selecting Bus option
+            $('#busOption').on('click', function () {
+                $('#map').show(); // Show map
+                $('#transportModal').fadeOut(); // Hide modal
+                showGoogleMap(from, to, 'TRANSIT'); // Use Google Maps with Transit mode for buses
+            });
+
+            // Click event for selecting Train option
+            $('#trainOption').on('click', function () {
+                $('#map').show(); // Show map
+                $('#transportModal').fadeOut(); // Hide modal
+                showGoogleMap(from, to, 'TRANSIT'); // Transit mode for trains
+            });
+
+            // Click event for selecting Flight option
+            $('#flightOption').on('click', function () {
+                $('#map').show(); // Show map
+                $('#transportModal').fadeOut(); // Hide modal
+                showGoogleMap(from, to, 'DRIVING'); // Handle flights with driving mode (custom handling)
+            });
+        });
+
+        // Function to show Google Map based on selected transport mode
+        function showGoogleMap(from, to, travelMode) {
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 6,
+                center: { lat: 20.5937, lng: 78.9629 }, // Centered to India by default
+            });
+
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                panel: document.getElementById('map'), // Show route details
+            });
+
+            directionsService.route({
+                origin: from,
+                destination: to,
+                travelMode: google.maps.TravelMode[travelMode], // 'TRANSIT', 'DRIVING', etc.
+                provideRouteAlternatives: true,
+            }, function (response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response);
+                } else {
+                    alert('Directions request failed due to ' + status);
+                }
+            });
+        }
     });
 </script>
 
