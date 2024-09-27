@@ -99,3 +99,6 @@ body {
             font-size: 14px;
             color: #999;
         }
+        .google-login-btn i {
+                    margin-right: 8px;
+                }

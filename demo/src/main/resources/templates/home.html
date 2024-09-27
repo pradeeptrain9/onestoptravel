@@ -145,7 +145,7 @@
                 origin: from,
                 destination: to,
                 travelMode: google.maps.TravelMode[travelMode], // 'TRANSIT', 'DRIVING', etc.
-                provideRouteAlternatives: true,
+                provideRouteAlternatives: false,
             }, function (response, status) {
                 if (status === 'OK') {
                     directionsRenderer.setDirections(response);
