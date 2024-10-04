@@ -108,52 +108,26 @@
 
             // Click event for selecting Bus option
             $('#busOption').on('click', function () {
-                $('#map').show(); // Show map
-                $('#transportModal').fadeOut(); // Hide modal
-                showGoogleMap(from, to, 'TRANSIT'); // Use Google Maps with Transit mode for buses
+                redirectToOptions('bus', from, to, date);
             });
 
             // Click event for selecting Train option
             $('#trainOption').on('click', function () {
-                $('#map').show(); // Show map
-                $('#transportModal').fadeOut(); // Hide modal
-                showGoogleMap(from, to, 'TRANSIT'); // Transit mode for trains
+                redirectToOptions('train', from, to, date);
             });
 
             // Click event for selecting Flight option
             $('#flightOption').on('click', function () {
-                $('#map').show(); // Show map
-                $('#transportModal').fadeOut(); // Hide modal
-                showGoogleMap(from, to, 'DRIVING'); // Handle flights with driving mode (custom handling)
+                redirectToOptions('flight', from, to, date);
             });
         });
 
-        // Function to show Google Map based on selected transport mode
-        function showGoogleMap(from, to, travelMode) {
-            const map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 6,
-                center: { lat: 20.5937, lng: 78.9629 }, // Centered to India by default
-            });
-
-            const directionsService = new google.maps.DirectionsService();
-            const directionsRenderer = new google.maps.DirectionsRenderer({
-                map: map,
-                panel: document.getElementById('map'), // Show route details
-            });
-
-            directionsService.route({
-                origin: from,
-                destination: to,
-                travelMode: google.maps.TravelMode[travelMode], // 'TRANSIT', 'DRIVING', etc.
-                provideRouteAlternatives: false,
-            }, function (response, status) {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(response);
-                } else {
-                    alert('Directions request failed due to ' + status);
-                }
-            });
+        // Function to redirect to the transport-specific options page
+        function redirectToOptions(transportType, from, to, date) {
+        const params = `from=${from}&to=${to}&date=${date}&transportType=${transportType}`;
+        window.location.href = `/transportOptions?${params}`;
         }
+
     });
 </script>
 

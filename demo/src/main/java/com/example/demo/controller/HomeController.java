@@ -24,6 +24,9 @@ public class HomeController {
     }
 
 
-
+    @GetMapping("/transportOptions")
+    public String transportOptions() {
+        return "transportOptions"; // Serve the home.html template after login
+    }
 
 }

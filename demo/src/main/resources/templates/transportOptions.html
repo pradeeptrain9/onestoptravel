@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Agency Options</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxOmAzwV1e3o5EqlM7LyA7MKGvYD-TUf0&libraries=places,geocoding"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+            display: none; /* Hide the map initially */
+        }
+        .agency-list {
+            margin-top: 20px;
+        }
+        .agency-item {
+            padding: 10px;
+            background-color: #f2f2f2;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Select a Travel Agency</h2>
+
+<!-- Map will be shown when a travel agency is selected -->
+<div id="map"></div>
+<div class="agency-list" id="agencyList"></div>
+
+<script>
+    let map;
+    let service;
+    let userLocation;
+    let destinationLocation;
+    let fromLocation;
+    let toLocation;
+    let travelDate;
+
+    // Function to extract query parameters from the URL
+    function getQueryParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            from: urlParams.get('from'),
+            to: urlParams.get('to'),
+            date: urlParams.get('date')
+        };
+    }
+
+    // Function to geocode the "from" location to coordinates
+    function geocodeFromLocation(fromAddress) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: fromAddress }, (results, status) => {
+            if (status === google.maps.GeocoderStatus.OK) {
+                userLocation = results[0].geometry.location; // Get the coordinates for the "from" address
+                loadTravelAgencies(); // Load travel agencies after successfully geocoding
+            } else {
+                alert('Geocoding failed: ' + status);
+            }
+        });
+    }
+
+
+
+    // Search for travel agencies near the user's location
+    function loadTravelAgencies() {
+        // Create the request to search for travel agencies near the user's location
+        const request = {
+            location: userLocation,
+            radius: '5000', // Search within 5 km
+            keyword: 'travel agency'
+        };
+
+        // Use the PlacesService without initializing the map
+        service = new google.maps.places.PlacesService(document.createElement('div')); // No map element used here
+        service.nearbySearch(request, handleNearbySearchResults);
+    }
+
+    // Handle the results from the Places API search
+    // Handle the results from the Places API search
+function handleNearbySearchResults(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+        console.log("Travel Agencies Found:", results); // Print results to console
+        const agencyList = document.getElementById('agencyList');
+        agencyList.innerHTML = ''; // Clear previous results
+
+        results.forEach((place) => {
+            const agencyItem = document.createElement('div');
+            agencyItem.classList.add('agency-item');
+
+
+
+            // Create a text node for the name
+            const nameText = document.createTextNode(`${place.name} `);
+
+            // Create a text node for the rating
+            const ratingText = document.createTextNode(`(Rating: ${place.rating})`);
+
+            // Append icon, name, vicinity, and rating to the agency item
+            agencyItem.appendChild(nameText);
+            agencyItem.appendChild(ratingText);
+
+            agencyItem.dataset.placeId = place.place_id;
+
+            // Add click event to show map and route
+            agencyItem.addEventListener('click', () => {
+                initializeMap();
+                showRoute(place.geometry.location); // Pass the agency location to show the route
+            });
+
+            agencyList.appendChild(agencyItem);
+        });
+    } else {
+        alert('Failed to retrieve travel agencies.');
+    }
+}
+
+
+    // Initialize the map when a travel agency is selected
+    function initializeMap() {
+        if (!map) {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: userLocation,
+                zoom: 12
+            });
+            document.getElementById('map').style.display = 'block'; // Show the map
+        }
+    }
+
+    // Show route using Directions API
+    function showRoute(origin) {
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        const request = {
+            origin: userLocation, // Use the geocoded "from" location
+            destination: origin, // Travel agency location
+            travelMode: google.maps.TravelMode.DRIVING // Use DRIVING, TRANSIT, etc.
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsRenderer.setDirections(result);
+            } else {
+                alert('Could not retrieve directions: ' + status);
+            }
+        });
+    }
+
+    // Initialize the page with the extracted "from", "to", and "date" values
+    window.onload = () => {
+        const queryParams = getQueryParams();
+        fromLocation = queryParams.from;
+        toLocation = queryParams.to;
+        travelDate = queryParams.date;
+
+        if (fromLocation) {
+            geocodeFromLocation(fromLocation); // Geocode the "from" address
+        } else {
+            alert('No "from" location provided.');
+        }
+
+
+    };
+</script>
+
+</body>
+</html>
