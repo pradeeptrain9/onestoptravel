@@ -156,7 +156,25 @@
                 agencyList.appendChild(agencyItem);
             });
         } else {
-            alert('Failed to retrieve travel agencies.');
+            let errorMessage = 'Failed to retrieve travel agencies.';
+        switch (status) {
+            case google.maps.places.PlacesServiceStatus.ZERO_RESULTS:
+                errorMessage = 'No travel agencies found in this area.';
+                break;
+            case google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT:
+                errorMessage = 'You have exceeded your daily request quota for Places API.';
+                break;
+            case google.maps.places.PlacesServiceStatus.REQUEST_DENIED:
+                errorMessage = 'Your API request was denied. Check your API key and billing.';
+                break;
+            case google.maps.places.PlacesServiceStatus.INVALID_REQUEST:
+                errorMessage = 'Invalid request. Make sure the location data is correct.';
+                break;
+            case google.maps.places.PlacesServiceStatus.UNKNOWN_ERROR:
+                errorMessage = 'An unknown error occurred. Please try again later.';
+                break;
+        }
+        alert(errorMessage);
         }
     }
 
@@ -214,7 +232,7 @@
         mode = queryParams.mode;
 
         if (fromLocation) {
-            geocodeFromLocation(fromLocation); // Geocode the "from" address
+            geocodeFromLocation(fromLocation);
         } else {
             alert('No "from" location provided.');
         }
