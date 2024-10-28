@@ -1,7 +1,7 @@
 /* General styles for the page */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #e0f7fa;
+    background-color: #f0f4f8;
     margin: 0;
     padding: 0;
     color: #333;
@@ -9,12 +9,13 @@ body {
 
 /* Header */
 .header {
-    background-color: #004080;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
     color: #fff;
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header h2 {
@@ -23,29 +24,40 @@ body {
 }
 
 .logout-btn {
-    background-color: #ff6600;
+    background-color: #ff4081;
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 50px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .logout-btn:hover {
-    background-color: #e65c00;
+    background-color: #e0356e;
+    transform: scale(1.05);
 }
 
 /* Main content container */
 .container {
-    width: 80%;
+    width: 90%;
     max-width: 800px;
-    margin: 50px auto;
-    background-color: #fff;
+    margin: 60px auto;
+    background-color: #ffffff;
     padding: 40px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.container h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    position: relative;
 }
 
 /* Form styling */
@@ -65,27 +77,29 @@ form {
 
 .input-group label {
     flex-basis: 100%;
-    margin-bottom: 10px;
     font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    text-align: left;
 }
 
 .input-group input[type="date"],
 .input-group select {
     flex-basis: 48%;
-    padding: 10px;
-    border-radius: 4px;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-size: 1rem;
-    background-color: #004080; /* Dark blue background for inputs */
-    color: #fff; /* White text for contrast */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fafafa;
+    color: #333;
+    transition: all 0.3s ease;
 }
 
 input[type="date"]:focus,
 select:focus {
-    transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(255, 215, 0, 0.7); /* Gold shadow on focus */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Custom dropdown styling */
@@ -93,71 +107,92 @@ select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"%3E%3Cpath fill="%23FFFFFF" d="M2 0L0 2h4z"/%3E%3C/svg%3E');
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"%3E%3Cpath fill="%23999999" d="M2 0L0 2h4z"/%3E%3C/svg%3E');
     background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 8px 10px;
+    background-position: right 12px center;
+    background-size: 10px 12px;
 }
 
 select::-ms-expand {
-    display: none; /* Hide default arrow in IE */
+    display: none;
 }
 
+/* Book button styling */
 .book-btn {
-    background-color: #ff6600;
+    background-color: #6a11cb;
     color: white;
     border: none;
     padding: 15px 20px;
-    border-radius: 4px;
+    border-radius: 50px;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    margin-top: 20px;
 }
 
 .book-btn:hover {
-    background-color: #e65c00;
+    background-color: #5a0ec8;
+    transform: scale(1.05);
 }
 
-/* Add media queries for responsiveness */
+/* Modal styling */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    max-width: 300px;
+    width: 100%;
+}
+
+.transport-btn {
+    background-color: #ff4081;
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 50px;
+    margin: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.transport-btn:hover {
+    background-color: #e0356e;
+    transform: scale(1.05);
+}
+
+/* Google Map container styling */
+#map {
+    height: 500px;
+    width: 100%;
+    margin-top: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
+/* Media queries for responsiveness */
 @media (max-width: 600px) {
     .input-group select,
     .input-group input[type="date"] {
-        flex-basis: 100%; /* Make inputs full width on smaller screens */
+        flex-basis: 100%;
+    }
+    .book-btn {
+        font-size: 1rem;
     }
 }
-
-.modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-    }
-
-    .transport-btn {
-        background-color: #ff6600;
-        color: white;
-        padding: 15px 20px;
-        border: none;
-        border-radius: 4px;
-        margin: 10px;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .transport-btn:hover {
-        background-color: #e65c00;
-    }

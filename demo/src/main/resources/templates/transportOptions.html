@@ -6,23 +6,73 @@
     <title>Travel Agency Options</title>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxOmAzwV1e3o5EqlM7LyA7MKGvYD-TUf0&libraries=places,geocoding"></script>
     <style>
+        /* Global styling */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #00adb5;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Map and agency list styling */
         #map {
             height: 500px;
             width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none; /* Hide initially */
         }
+
         .agency-list {
             margin-top: 20px;
+            width: 90%;
+            max-width: 700px;
         }
+
         .agency-item {
-            padding: 10px;
-            background-color: #f2f2f2;
-            margin-bottom: 10px;
+            padding: 15px;
+            background-color: #393e46;
+            margin-bottom: 12px;
             cursor: pointer;
-            border: 1px solid #ccc;
+            border-radius: 8px;
+            border: 1px solid #00adb5;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: transform 0.3s, background-color 0.3s;
         }
+
+        .agency-item:hover {
+            transform: scale(1.05);
+            background-color: #00adb5;
+            color: #ffffff;
+        }
+
+        button {
+            background-color: #00adb5;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #007d8e;
+        }
+
         /* Modal styles */
         .modal {
             display: none; /* Hidden by default */
@@ -32,45 +82,52 @@
             top: 0;
             width: 100%; /* Full width */
             height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Blur background */
         }
+
         .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
+            background-color: #222831;
+            color: #eeeeee;
+            margin: 10% auto;
             padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
         }
+
         .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+            color: #eeeeee;
+            font-size: 24px;
             cursor: pointer;
+            float: right;
+            transition: color 0.2s;
+        }
+
+        .close:hover {
+            color: #00adb5;
+        }
+        .rating {
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
 
-<h2>Select a Travel Agency</h2>
+<h2>Explore Nearby Travel Agencies</h2>
 
 <!-- Modal for displaying the map -->
 <div id="mapModal" class="modal">
     <div class="modal-content">
         <span class="close" id="closeModal">&times;</span>
-        <h2>Route to Agency</h2>
+        <h3>Route to Agency</h3>
         <div id="modalMap" style="height: 400px; width: 100%;"></div>
     </div>
 </div>
 
-<div id="map" style="display: none;"></div>
+<div id="map"></div>
 <div class="agency-list" id="agencyList"></div>
 
 <script>
@@ -83,7 +140,7 @@
     let travelDate;
     let mode;
 
-    // Function to extract query parameters from the URL
+    // Get query parameters
     function getQueryParams() {
         const urlParams = new URLSearchParams(window.location.search);
         return {
@@ -94,120 +151,97 @@
         };
     }
 
-    // Function to geocode the "from" location to coordinates
+    // Geocode the "from" location
     function geocodeFromLocation(fromAddress) {
         const geocoder = new google.maps.Geocoder();
         geocoder.geocode({ address: fromAddress }, (results, status) => {
             if (status === google.maps.GeocoderStatus.OK) {
-                userLocation = results[0].geometry.location; // Get the coordinates for the "from" address
-                loadTravelAgencies(); // Load travel agencies after successfully geocoding
+                userLocation = results[0].geometry.location;
+                loadTravelAgencies();
             } else {
                 alert('Geocoding failed: ' + status);
             }
         });
     }
 
-    // Search for travel agencies near the user's location
+    // Load travel agencies near user
     function loadTravelAgencies() {
-        // Create the request to search for travel agencies near the user's location
         const request = {
             location: userLocation,
-            radius: '5000', // Search within 5 km
+            radius: '5000',
             keyword: mode + ' travel agencies which provide services between ' + fromLocation + " to " + toLocation
         };
 
-        // Use the PlacesService without initializing the map
-        console.log(request.keyword);
-        service = new google.maps.places.PlacesService(document.createElement('div')); // No map element used here
+        service = new google.maps.places.PlacesService(document.createElement('div'));
         service.nearbySearch(request, handleNearbySearchResults);
     }
 
-    // Handle the results from the Places API search
+    // Handle Places API search results
     function handleNearbySearchResults(results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-            console.log("Travel Agencies Found:", results); // Print results to console
             const agencyList = document.getElementById('agencyList');
-            agencyList.innerHTML = ''; // Clear previous results
+            agencyList.innerHTML = '';
 
             results.forEach((place) => {
                 const agencyItem = document.createElement('div');
                 agencyItem.classList.add('agency-item');
-
-                // Create a text node for the name
                 const nameText = document.createTextNode(`${place.name} `);
-
-                // Create a text node for the rating
-                const ratingText = document.createTextNode(`(Rating: ${place.rating})`);
-
-                // Create a button to open the modal
+                const ratingDiv = document.createElement('div');
+                ratingDiv.classList.add('rating');
+                ratingDiv.innerText = `Rating: ${place.rating}`;
                 const button = document.createElement('button');
-                button.innerText = 'Show Map';
-                button.onclick = () => {
-                    openModal(place.geometry.location);
-                };
-
-                // Append name, rating, and button to the agency item
+                button.innerText = 'Route';
+                button.onclick = () => openModal(place.geometry.location);
                 agencyItem.appendChild(nameText);
-                agencyItem.appendChild(ratingText);
+                agencyItem.appendChild(ratingDiv);
                 agencyItem.appendChild(button);
-
                 agencyItem.dataset.placeId = place.place_id;
-
                 agencyList.appendChild(agencyItem);
             });
         } else {
             let errorMessage = 'Failed to retrieve travel agencies.';
-        switch (status) {
-            case google.maps.places.PlacesServiceStatus.ZERO_RESULTS:
-                errorMessage = 'No travel agencies found in this area.';
-                break;
-            case google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT:
-                errorMessage = 'You have exceeded your daily request quota for Places API.';
-                break;
-            case google.maps.places.PlacesServiceStatus.REQUEST_DENIED:
-                errorMessage = 'Your API request was denied. Check your API key and billing.';
-                break;
-            case google.maps.places.PlacesServiceStatus.INVALID_REQUEST:
-                errorMessage = 'Invalid request. Make sure the location data is correct.';
-                break;
-            case google.maps.places.PlacesServiceStatus.UNKNOWN_ERROR:
-                errorMessage = 'An unknown error occurred. Please try again later.';
-                break;
-        }
-        alert(errorMessage);
+            switch (status) {
+                case google.maps.places.PlacesServiceStatus.ZERO_RESULTS:
+                    errorMessage = 'No travel agencies found in this area.';
+                    break;
+                case google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT:
+                    errorMessage = 'You have exceeded your daily request quota for Places API.';
+                    break;
+                case google.maps.places.PlacesServiceStatus.REQUEST_DENIED:
+                    errorMessage = 'Your API request was denied. Check your API key and billing.';
+                    break;
+                case google.maps.places.PlacesServiceStatus.INVALID_REQUEST:
+                    errorMessage = 'Invalid request. Make sure the location data is correct.';
+                    break;
+                case google.maps.places.PlacesServiceStatus.UNKNOWN_ERROR:
+                    errorMessage = 'An unknown error occurred. Please try again later.';
+                    break;
+            }
+            alert(errorMessage);
         }
     }
 
-    // Function to open the modal and show the map
+    // Open modal for directions
     function openModal(location) {
         const modal = document.getElementById("mapModal");
         const modalMap = document.getElementById("modalMap");
-
-        // Initialize a new map in the modal
         const modalMapInstance = new google.maps.Map(modalMap, {
             center: location,
             zoom: 12
         });
-
-        // Show the modal
         modal.style.display = "block";
-
-        // Show the route to the agency in the modal
         showRoute(location, modalMapInstance);
     }
 
-    // Function to show route using Directions API
     function showRoute(destination, modalMapInstance) {
         const directionsService = new google.maps.DirectionsService();
         const directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(modalMapInstance); // Set the map to the modal
-
+        directionsRenderer.setMap(modalMapInstance);
         const request = {
-            origin: userLocation, // Use the geocoded "from" location
-            destination: destination, // Travel agency location
-            travelMode: google.maps.TravelMode.DRIVING // Use DRIVING, TRANSIT, etc.
+            origin: userLocation,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING
         };
-
         directionsService.route(request, (result, status) => {
             if (status === google.maps.DirectionsStatus.OK) {
                 directionsRenderer.setDirections(result);
@@ -217,25 +251,19 @@
         });
     }
 
-    // Close the modal when the user clicks on <span> (x)
     document.getElementById("closeModal").onclick = function() {
         const modal = document.getElementById("mapModal");
         modal.style.display = "none";
     }
 
-    // Initialize the page with the extracted "from", "to", and "date" values
     window.onload = () => {
         const queryParams = getQueryParams();
         fromLocation = queryParams.from;
         toLocation = queryParams.to;
         travelDate = queryParams.date;
         mode = queryParams.mode;
-
-        if (fromLocation) {
-            geocodeFromLocation(fromLocation);
-        } else {
-            alert('No "from" location provided.');
-        }
+        if (fromLocation) geocodeFromLocation(fromLocation);
+        else alert('No "from" location provided.');
     };
 </script>
 
