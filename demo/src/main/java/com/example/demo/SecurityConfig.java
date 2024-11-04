@@ -37,14 +37,6 @@ public class SecurityConfig {
                 .oauth2Login(oauth2Login ->
                         oauth2Login
                                 .loginPage("/login") // Custom login page
-                                .userInfoEndpoint(userInfo ->
-                                        userInfo.userService(oAuth2UserService())
-                                )
-                                .authorizationEndpoint(authEndpoint ->
-                                        authEndpoint.baseUri("/oauth2/authorize")
-                                                .authorizationRequestResolver(
-                                                        new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorize"))
-                                )
                                 .defaultSuccessUrl("/home", true) // Redirect to home on successful login
                                 .failureUrl("/login?error=true")
 
@@ -81,10 +73,11 @@ public class SecurityConfig {
             OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
             // Extract user information and store in the database
+
             String email = oAuth2User.getAttribute("email");
             String name = oAuth2User.getAttribute("name");
-            String phoneNumber = oAuth2User.getAttribute("phone_number");
-
+            String phoneNumber = oAuth2User.getAttribute("phoneNumber");
+            System.out.print(email);
             userService.processOAuthPostLogin(email, name, phoneNumber);
 
             return oAuth2User;
