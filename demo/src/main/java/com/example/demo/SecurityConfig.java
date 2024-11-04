@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -17,8 +18,11 @@ public class SecurityConfig {
 
     private final UserService userService;
 
-    public SecurityConfig(UserService userService) {
+    private final ClientRegistrationRepository clientRegistrationRepository;
+
+    public SecurityConfig(UserService userService, ClientRegistrationRepository clientRegistrationRepository) {
         this.userService = userService;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Bean
@@ -33,8 +37,17 @@ public class SecurityConfig {
                 .oauth2Login(oauth2Login ->
                         oauth2Login
                                 .loginPage("/login") // Custom login page
+                                .userInfoEndpoint(userInfo ->
+                                        userInfo.userService(oAuth2UserService())
+                                )
+                                .authorizationEndpoint(authEndpoint ->
+                                        authEndpoint.baseUri("/oauth2/authorize")
+                                                .authorizationRequestResolver(
+                                                        new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorize"))
+                                )
                                 .defaultSuccessUrl("/home", true) // Redirect to home on successful login
                                 .failureUrl("/login?error=true")
+
                 )
                 .formLogin(formLogin ->
                         formLogin
@@ -70,8 +83,9 @@ public class SecurityConfig {
             // Extract user information and store in the database
             String email = oAuth2User.getAttribute("email");
             String name = oAuth2User.getAttribute("name");
+            String phoneNumber = oAuth2User.getAttribute("phone_number");
 
-            userService.processOAuthPostLogin(email, name);
+            userService.processOAuthPostLogin(email, name, phoneNumber);
 
             return oAuth2User;
         };
