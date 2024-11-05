@@ -39,7 +39,7 @@ public class UserService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Thank you for registering with us!");
-        message.setText("Hello " + name + ",\n\nThank you for connecting with us. We’ve successfully saved your contact information.\n\nBest regards,\nYOneStopTravel");
+        message.setText("Hello " + name + ",\n\nThank you for connecting with us. We’ve successfully saved your contact information.\n\nBest regards,\nOneStopTravel");
 
         mailSender.send(message);
     }
